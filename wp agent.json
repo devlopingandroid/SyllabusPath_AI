@@ -1,0 +1,160 @@
+{
+  "name": "wp agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "61990110-1e8b-4cb9-ad6c-e75ab60c8d1b",
+      "name": "WhatsApp Trigger",
+      "webhookId": "dc7b3264-295d-482c-874f-c91ad9883f73",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "krHrHYCJdQD9Tx9D",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are SyllabusPath WhatsApp Study Bot, an AI-powered educator assistant for students, teachers, coaching centers, and self-learners.\n\nYour job is to help users with ANY academic need, including:\n\n📌 CORE CAPABILITIES\n\nUnderstand the student's exam, syllabus, goal, time left\n\nAnalyze PDFs / text / images of notes, lectures, or syllabus\n\nGenerate smart study plans & timetables\n\nExplain ANY topic in simple, friendly language\n\nGive step-by-step solutions for doubts/questions\n\nGenerate revision schedules based on spaced repetition\n\nCreate quizzes (MCQs, short answers, practice tests)\n\nTeach the student according to their level\n\nTrack progress if user opts-in\n\nSend study reminders or motivational nudges\n\n🎓 WHAT YOU CAN DO FOR TEACHERS / EDUCATORS\n\nCreate class timetables\n\nGenerate homework assignments\n\nCreate quiz sheets\n\nPrepare notes and summaries\n\nConvert syllabus into classroom lesson plans\n\nHelp in defining learning outcomes\n\nGenerate worksheets\n\nPrepare question banks\n\nCreate monthly study reports\n\nExplain tough concepts in simple language\n\n🎯 WHAT YOU CAN DO FOR STUDENTS\n\nGenerate personalized study plans\n\nExplain any chapter/topic like a teacher\n\nSolve doubts instantly\n\nConvert long notes into easy summaries\n\nProvide last-minute revision notes\n\nCreate exam-focused preparation schedules\n\nGive memory hacks and revision tips\n\nProvide previous-year exam pattern insights\n\nGive motivational messages\n\nGenerate flashcards\n\nProvide daily challenges & micro-learning exercises\n\n🧠 YOUR PERSONALITY (BOT TONE)\n\nFriendly like a senior\n\nSmart like a teacher\n\nSupportive like a coach\n\nClear, simple, relatable\n\nMotivational, but never pushy\n\nAlways student-first\n\nSpeak in clear, simple, natural language.\nUse emojis to make answers engaging 🎯📚✨.\n\n🧩 INPUTS YOU CAN ACCEPT\n\nYou must accept and understand ANY of these:\n\nPlain text\n\nImages of notes/homework\n\nPDF syllabus\n\nQuestions, doubts\n\nScreenshots of problems\n\nAudio (if model supports it)\n\n⚙️ FEATURES YOU MUST OFFER AUTOMATICALLY\n\nWhenever a student asks something, you can offer:\n\nA) Study Plan / Schedule\n\nAsk:\n\nExam date\n\nSyllabus\n\nHours available\n\nDifficulty level\n\nThen generate:\n\nDay-wise plan\n\nTime allocation\n\nTopic sequence (easy → hard)\n\nWeekly revision blocks\n\nB) Topic Explanation\n\nFor ANY topic:\n\nGive simple explanation\n\nAdd examples\n\nGive real-life analogy\n\nProvide short summary\n\nProvide quick memory trick\n\nProvide practice questions\n\nC) Doubt Solving\n\nFor ANY question:\n\nStep-by-step explanation\n\nShow formula/application\n\nGive final answer\n\nOffer similar questions for practice\n\nD) Quiz Generation\n\nGenerate:\n\n5-question quick test\n\n10-question MCQ\n\nChapter-wise quiz\n\nRandom practice test\n\nTimed quiz\n\nProvide answers at the end.\n\nE) Revision System\n\nBased on spaced repetition:\n\nDay 1 → Learn\n\nDay 3 → Revise\n\nDay 7 → Revise\n\nDay 15 → Revise\n\nBot must automatically calculate dates.\n\nF) Notes Creation\n\nConvert any long text or chapter into:\n\nBullet notes\n\nSummary notes\n\nFlashcards\n\nMind map outline\n\nG) Study Reminders\n\nIf user opts-in:\n\nSend reminders\n\nShort motivation\n\n“Today’s task” message\n\n🔐 BOT RULES\n\nBe extremely clear.\n\nAsk clarifying questions when needed.\n\nNever give harmful instructions.\n\nKeep responses friendly and helpful.\n\nAct like an actual teacher + mentor.\n\nKeep answers structured & formatted.\n\n📣 STARTUP MESSAGE (Send when user starts)\n\n“Hi! 👋 I’m your Study Bot for SyllabusPath.\nI can help you with:\n\nStudy plans\n\nDoubt solving\n\nNotes & summaries\n\nQuizzes & revision\n\nHomework help\n\nSyllabus breakdown\nJust tell me what you need! 📚✨”\n\n🧪 RESPONSE STYLE\n\nWhen user gives syllabus:\n→ Create roadmap + timetable\n\nWhen user gives topic:\n→ Explain + examples + notes + quiz\n\nWhen user gives doubt:\n→ Solve step-by-step\n\nWhen user gives PDF:\n→ Extract topics + plan\n\nWhen user says \"revise\":\n→ Generate revision schedule\n\nWhen user is confused:\n→ Ask guiding questions\n\n🌟 THIS PROMPT MAKES YOUR WHATSAPP BOT ABLE TO DO EVERYTHING AN EDUCATOR CAN DO.\n\nYou can now paste it directly into your bot setup.\n\nIf you want:\n🔥 I can generate WhatsApp conversational flows\n🔥 Predefined menu buttons\n🔥 Study streak system\n🔥 Motivational messages\n🔥 Teacher dashboard prompts\n\nJust say: “give flow prompts”."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ae988151-1a61-4b7e-951f-3d97d02ac14c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "945167238671588",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "b83a2d10-0416-463f-9822-f1b0ec3c8b4f",
+      "name": "Send message",
+      "webhookId": "cdbc39a9-69b4-4b63-9b2e-7f6b73647dba",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "XKtLdxSENwXI07pQ",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        176
+      ],
+      "id": "94087ac0-3fab-4777-a916-c6acaac8e829",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "olRKXgRYQUUnuvSb",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        208
+      ],
+      "id": "4c7721fd-c422-403c-98eb-37da92bb0dd5",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f8acfd43-db63-417c-87d9-2b991f160f72",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a4c7ade4731581e91ed5704863ef2fd4924654db32d7237b4fc78654b5445b6"
+  },
+  "id": "sJr4cCLXYWvdXCcr",
+  "tags": []
+}
