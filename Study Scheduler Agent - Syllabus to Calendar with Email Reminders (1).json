@@ -1,0 +1,505 @@
+{
+  "name": "Study Scheduler Agent - Syllabus to Calendar with Email Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Study Scheduler - Syllabus to Calendar",
+        "formDescription": "Upload your syllabus PDF and get an AI-generated study roadmap with automatic calendar scheduling and email reminders",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exam Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Syllabus PDF",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Generate My Study Plan"
+        }
+      },
+      "id": "942e4ce2-23d7-4c17-afe3-8500262a0a96",
+      "name": "Study Scheduler Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        48
+      ],
+      "webhookId": "65d9661b-2410-40ff-90b3-3c77e5ff4149"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "defaultStudyStartTime",
+              "value": "08:00",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "reminderHoursBefore",
+              "value": 2,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "14dd5efb-75c2-457b-851d-f28d446e8de6",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1osU-gaO7OpYi4vn_rMLJsbfnzXP4h8lgbtejl0trXhE",
+          "mode": "list",
+          "cachedResultName": "Time",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1osU-gaO7OpYi4vn_rMLJsbfnzXP4h8lgbtejl0trXhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1osU-gaO7OpYi4vn_rMLJsbfnzXP4h8lgbtejl0trXhE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "starttime",
+              "displayName": "starttime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "duration",
+              "displayName": "duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1d1cc566-bd7c-4824-8fd6-feb97ba2b43c",
+      "name": "Store Form Responses",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        960,
+        48
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mLXVRU7QzmTNKqIK",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Syllabus_PDF",
+        "options": {
+          "joinPages": true
+        }
+      },
+      "id": "d53aa092-5e77-4fd2-af88-1021e4cc5dfd",
+      "name": "Extract PDF Content",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1184,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Syllabus content:{{ $json.text }}",
+        "options": {
+          "systemMessage": "You are an expert educational content analyzer. Your task is to extract and structure study topics from syllabus content.\n\nAnalyze the provided syllabus and extract all topics. For each topic:\n1. Identify the topic name clearly\n2. Assess difficulty level (Beginner, Intermediate, or Advanced)\n3. Estimate study time needed in minutes (be realistic: 30-120 minutes per topic)\n\nReturn ONLY a valid JSON array in this exact format:\n[\n  {\"topic\": \"Topic Name\", \"difficulty\": \"Beginner\", \"estimatedMinutes\": 60},\n  {\"topic\": \"Another Topic\", \"difficulty\": \"Intermediate\", \"estimatedMinutes\": 90}\n]\n\nDo not include any markdown formatting, explanations, or additional text. Return only the JSON array."
+        }
+      },
+      "id": "364cb6b7-6269-4733-a8fa-d538cc268b62",
+      "name": "Topic Extraction Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1408,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the AI response and extract JSON array of topics\n// Handle potential markdown code blocks or extra text\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  let aiResponse = item.json.output || item.json.text || item.json.response || '';\n  \n  // Remove markdown code blocks if present\n  aiResponse = aiResponse.replace(/```json\\s*/g, '').replace(/```\\s*/g, '');\n  \n  // Try to find JSON array in the response\n  let topics = [];\n  \n  try {\n    // First, try to parse the entire response as JSON\n    const parsed = JSON.parse(aiResponse);\n    \n    // Check if it's already an array\n    if (Array.isArray(parsed)) {\n      topics = parsed;\n    } else if (parsed.topics && Array.isArray(parsed.topics)) {\n      // Check if topics are nested in an object\n      topics = parsed.topics;\n    } else {\n      // If it's an object, try to find an array property\n      const arrayKey = Object.keys(parsed).find(key => Array.isArray(parsed[key]));\n      if (arrayKey) {\n        topics = parsed[arrayKey];\n      }\n    }\n  } catch (error) {\n    // If direct parsing fails, try to extract JSON array using regex\n    const jsonArrayMatch = aiResponse.match(/\\[\\s*\\{[\\s\\S]*\\}\\s*\\]/);\n    if (jsonArrayMatch) {\n      try {\n        topics = JSON.parse(jsonArrayMatch[0]);\n      } catch (e) {\n        console.log('Failed to parse extracted JSON array:', e);\n      }\n    }\n  }\n  \n  results.push({\n    json: {\n      topics: topics,\n      originalResponse: aiResponse,\n      topicCount: topics.length\n    }\n  });\n}\n\nreturn results;"
+      },
+      "id": "66d2cb2e-1dba-4c27-9973-ca37eae81e95",
+      "name": "Parse Topics JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topics: {{ JSON.stringify($json.topics) }}\nExam Date:={{ $('Study Scheduler Form').item.json['Exam Date'] }}\nToday: {{ new Date().toISOString().split(\"T\")[0] }}",
+        "options": {
+          "systemMessage": "You are an expert study planner. Your task is to create an intelligent, balanced study roadmap.\n\nYou will receive:\n- A list of topics with difficulty levels and estimated study times\n- The exam date\n- Today's date\n\nCreate a day-by-day study plan that:\n1. Distributes topics evenly across available days until the exam\n2. Places more difficult topics earlier in the schedule\n3. Includes revision sessions for complex topics\n4. Balances daily workload (aim for 2-4 hours per day maximum)\n5. Leaves the last 2-3 days for comprehensive revision\n\nReturn ONLY a valid JSON array in this exact format:\n[\n  {\n    \"date\": \"YYYY-MM-DD\",\n    \"topics\": [\"Topic A\", \"Topic B\"],\n    \"totalMinutes\": 120,\n    \"focus\": \"Introduction and fundamentals\"\n  },\n  {\n    \"date\": \"YYYY-MM-DD\",\n    \"topics\": [\"Topic C\"],\n    \"totalMinutes\": 90,\n    \"focus\": \"Advanced concepts\"\n  }\n]\n\nDo not include markdown formatting or explanations. Return only the JSON array."
+        }
+      },
+      "id": "fca7305a-d0d2-4867-9e9a-691987c11655",
+      "name": "Roadmap Builder Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1984,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the AI roadmap response and extract JSON array\nconst items = $input.all();\nconst outputItems = [];\n\nfor (const item of items) {\n  let roadmapText = item.json.output || item.json.text || '';\n  \n  // Remove markdown code blocks if present\n  roadmapText = roadmapText.replace(/```json\\s*/g, '').replace(/```\\s*/g, '');\n  \n  // Trim whitespace\n  roadmapText = roadmapText.trim();\n  \n  try {\n    // Parse the JSON\n    const roadmapData = JSON.parse(roadmapText);\n    \n    // If it's an array, add each item\n    if (Array.isArray(roadmapData)) {\n      roadmapData.forEach(topic => {\n        outputItems.push({\n          json: topic\n        });\n      });\n    } else {\n      // If it's an object, add it as a single item\n      outputItems.push({\n        json: roadmapData\n      });\n    }\n  } catch (error) {\n    // If parsing fails, return the error\n    outputItems.push({\n      json: {\n        error: 'Failed to parse roadmap JSON',\n        message: error.message,\n        rawText: roadmapText\n      }\n    });\n  }\n}\n\nreturn outputItems;"
+      },
+      "id": "0549b18b-3636-4ddc-8b40-78f6b9df8bfc",
+      "name": "Parse Roadmap JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform roadmap items into calendar events with proper date/time formatting\nconst roadmapItems = $input.all();\nconst formData = $('Study Scheduler Form').item.json;\nconst workflowConfig = $('Workflow Configuration').item.json;\n\nconst userName = formData['Your Name'] || formData.name || 'Student';\nconst userEmail = formData['Email Address'] || formData.email || '';\nconst defaultStudyStartTime = workflowConfig.defaultStudyStartTime || '08:00';\n\nconst events = [];\n\nfor (const item of roadmapItems) {\n  const roadmapEntry = item.json;\n  \n  // Parse the date from the roadmap item\n  const eventDate = new Date(roadmapEntry.date);\n  \n  // Set start time using defaultStudyStartTime from config\n  const [startHour, startMinute] = defaultStudyStartTime.split(':').map(Number);\n  eventDate.setHours(startHour, startMinute, 0, 0);\n  \n  // Calculate end time based on totalMinutes\n  const totalMinutes = roadmapEntry.totalMinutes || 60;\n  const endDate = new Date(eventDate);\n  endDate.setMinutes(endDate.getMinutes() + totalMinutes);\n  \n  // Create event summary from topics joined\n  const topicsArray = roadmapEntry.topics || [];\n  const summary = topicsArray.join(', ');\n  \n  // Create description with focus and topic details\n  const description = `Study Session for ${userName}\\n\\nFocus: ${roadmapEntry.focus || 'General study'}\\n\\nTopics:\\n${topicsArray.map(t => `• ${t}`).join('\\n')}\\n\\nDuration: ${totalMinutes} minutes`;\n  \n  events.push({\n    json: {\n      summary: summary,\n      description: description,\n      startDateTime: eventDate.toISOString(),\n      endDateTime: endDate.toISOString(),\n      recipientEmail: userEmail,\n      userName: userName,\n      topics: topicsArray,\n      focus: roadmapEntry.focus,\n      totalMinutes: totalMinutes,\n      date: roadmapEntry.date\n    }\n  });\n}\n\nreturn events;"
+      },
+      "id": "e0338cb8-4a10-4669-92a2-51a34c377075",
+      "name": "Prepare Calendar Events",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "classroom109866165951519953587@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "10th A"
+        },
+        "start": "={{ $json.startDateTime }}",
+        "end": "={{ $json.endDateTime }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "summary": "={{ $json.summary }}"
+        }
+      },
+      "id": "23c8ceb1-9d86-4a30-a4f3-dbb21f39516a",
+      "name": "Create Calendar Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2784,
+        48
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "2avGo4mnPkDljhlW",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare email reminders for each calendar event\nconst items = $input.all();\nconst emailReminders = [];\n\n// Get user data from form\nconst formData = $('Study Scheduler Form').item.json;\nconst userName = formData['Your Name'] || formData.name || 'Student';\nconst userEmail = formData['Email Address'] || formData.email;\n\n// Get reminder configuration\nconst config = $('Workflow Configuration').item.json;\nconst reminderHoursBefore = config.reminderHoursBefore || 2;\n\nfor (const item of items) {\n  const event = item.json;\n  \n  // Extract event details\n  const topic = event.summary || event.topic || 'Study Session';\n  const startTime = event.start?.dateTime || event.start || event.startTime;\n  const description = event.description || '';\n  \n  // Format date and time for email\n  const eventDate = new Date(startTime);\n  const formattedDate = eventDate.toLocaleDateString('en-US', { \n    weekday: 'long', \n    year: 'numeric', \n    month: 'long', \n    day: 'numeric' \n  });\n  const formattedTime = eventDate.toLocaleTimeString('en-US', { \n    hour: '2-digit', \n    minute: '2-digit' \n  });\n  \n  // Create email subject\n  const emailSubject = `📚 Study Reminder: ${topic}`;\n  \n  // Create HTML email body\n  const htmlBody = `\n<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px; }\n    .content { background-color: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }\n    .detail { margin: 10px 0; padding: 10px; background-color: white; border-left: 4px solid #4CAF50; }\n    .footer { margin-top: 20px; text-align: center; color: #666; font-size: 14px; }\n    .emoji { font-size: 1.2em; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>📚 Study Session Reminder</h1>\n    </div>\n    \n    <div class=\"content\">\n      <p>Hello <strong>${userName}</strong>!</p>\n      \n      <p>This is a friendly reminder about your upcoming study session:</p>\n      \n      <div class=\"detail\">\n        <p><span class=\"emoji\">📖</span> <strong>Topic:</strong> ${topic}</p>\n      </div>\n      \n      <div class=\"detail\">\n        <p><span class=\"emoji\">📅</span> <strong>Date:</strong> ${formattedDate}</p>\n      </div>\n      \n      <div class=\"detail\">\n        <p><span class=\"emoji\">⏰</span> <strong>Time:</strong> ${formattedTime}</p>\n      </div>\n      \n      ${description ? `<div class=\"detail\"><p><span class=\"emoji\">📝</span> <strong>Details:</strong> ${description}</p></div>` : ''}\n      \n      <p style=\"margin-top: 20px;\">Make sure you have all your materials ready and find a quiet place to focus.</p>\n      \n      <p style=\"color: #4CAF50; font-weight: bold;\">💪 You've got this! Stay focused and keep up the great work!</p>\n    </div>\n    \n    <div class=\"footer\">\n      <p>Best regards,<br>Your Study Scheduler</p>\n      <p style=\"font-size: 12px; color: #999;\">This reminder was sent ${reminderHoursBefore} hours before your scheduled session.</p>\n    </div>\n  </div>\n</body>\n</html>\n  `.trim();\n  \n  emailReminders.push({\n    json: {\n      recipientEmail: userEmail,\n      subject: emailSubject,\n      htmlBody: htmlBody,\n      topic: topic,\n      eventDate: formattedDate,\n      eventTime: formattedTime,\n      startTime: startTime,\n      description: description\n    }\n  });\n}\n\nreturn emailReminders;"
+      },
+      "id": "aaa56ba2-af36-44c4-8897-673d0fcec993",
+      "name": "Prepare Email Reminders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3008,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.recipientEmail }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.htmlBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "5370ba3e-7f4e-4927-9d33-92682e2a7b41",
+      "name": "Send Email Reminders",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3232,
+        48
+      ],
+      "webhookId": "796e9049-d8c3-47a5-9d96-ee867f9612f6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YFKPBquSP3d5Cufw",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        336
+      ],
+      "id": "5d698760-9999-49e1-a7b1-567a84654f9a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "olRKXgRYQUUnuvSb",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        256
+      ],
+      "id": "af3c40b0-945e-4f24-94c4-05d3e7162b28",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "olRKXgRYQUUnuvSb",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Study Scheduler Form": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Store Form Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Form Responses": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Content": {
+      "main": [
+        [
+          {
+            "node": "Topic Extraction Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Topic Extraction Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Topics JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Topics JSON": {
+      "main": [
+        [
+          {
+            "node": "Roadmap Builder Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Roadmap Builder Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Roadmap JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Roadmap JSON": {
+      "main": [
+        [
+          {
+            "node": "Prepare Calendar Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Calendar Events": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Calendar Events": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Reminders": {
+      "main": [
+        [
+          {
+            "node": "Send Email Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Topic Extraction Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Roadmap Builder Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d2fee890-e2c8-4503-ba84-cb479cf1c4f7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a4c7ade4731581e91ed5704863ef2fd4924654db32d7237b4fc78654b5445b6"
+  },
+  "id": "DmtuDNT32t6GxuUk",
+  "tags": []
+}
